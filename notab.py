@@ -1,6 +1,6 @@
 import re
 from enum import Enum
-from tabulate import tabulate
+#from tabulate import tabulate
 
 class TokenType(Enum):
 	TAG_OPEN_SYMBOL = 0
@@ -162,7 +162,8 @@ def printout():
 			else :
 				x.append([tok.html,tok.type.name])
 		print()
-		print(tabulate(x))
+		#print(tabulate(x))
+		print(x,'\n')
 		print()
 		row_i+=1
 #-----------------------------------------
