@@ -13,7 +13,7 @@ class TokenType(Enum):
 	RAW_DATA = 7
 	COMMENT_OPEN = 8
 	COMMENT_CLOSE = 9
-	ALPHABHET = 10
+	ALPHABET = 10
 	ELEMENT = 11
 	DIVIDER = 12
 	DOCUMENT_TYPE = 13
@@ -53,36 +53,35 @@ def TokenBuilder(string,idx):
 		result_self_closing_tag == [] and
 		result_raw_data == [] and
 		result_document_type == []) :
-
 		result_raw_data2		= re_raw_data2.findall(string)
 	else :
 		result_raw_data2		= []
-
-		tokenize(idx,result_document_type,'document_type')
-		tokenize(idx,result_comment_open,'comment_open')
-		tokenize(idx,result_open_tag,'open_tag')
-		tokenize(idx,result_self_closing_tag,'self_closing_tag')
-		tokenize(idx,result_raw_data,'raw_data')
-		tokenize(idx,result_raw_data2,'raw_data2')
-		tokenize(idx,result_close_tag,'close_tag')
-		tokenize(idx,result_comment_close,'comment_close')
-
-		global list_token
-		list_token.append(tokens)
+		
+	tokenize(idx,result_document_type,'document_type')
+	tokenize(idx,result_comment_open,'comment_open')
+	tokenize(idx,result_open_tag,'open_tag')
+	tokenize(idx,result_self_closing_tag,'self_closing_tag')
+	tokenize(idx,result_raw_data,'raw_data')
+	tokenize(idx,result_raw_data2,'raw_data2')
+	tokenize(idx,result_close_tag,'close_tag')
+	tokenize(idx,result_comment_close,'comment_close')
+	global list_token
+	list_token.append(tokens)
 
 def tokenize(idx,results,tipe):
 	global tokens
-	if tipe == 'comment_open' and results != []:
+	print(results,tipe)
+	if tipe == 'comment_open' and results:
 		tokens.append(Token(idx,'== COMMENT OPEN ==',TokenType.ELEMENT))
-	if tipe == 'open_tag' and results != [] : 
+	if tipe == 'open_tag' and results: 
 		tokens.append(Token(idx,'== OPENING TAG ==',TokenType.ELEMENT))
-	if tipe == 'self_closing_tag' and results != [] :
+	if tipe == 'self_closing_tag' and results:
 		tokens.append(Token(idx,'== SELF CLOSING TAG ==',TokenType.ELEMENT))
-	if tipe == 'close_tag' and results != [] :
+	if tipe == 'close_tag' and results:
 		tokens.append(Token(idx,'== CLOSING TAG ==',TokenType.ELEMENT))
-	if tipe == 'comment_close' and results != [] :
+	if tipe == 'comment_close' and results:
 		tokens.append(Token(idx,'== COMMENT CLOSE ==',TokenType.ELEMENT))
-	if tipe == 'document_type' and results != [] :
+	if tipe == 'document_type' and results:
 		tokens.append(Token(idx,'== DOCUMENT TYPE ==',TokenType.ELEMENT))
 	for result in results:
 		if result == None : return
@@ -167,7 +166,7 @@ def printout():
 			elif(tok.type == TokenType.DIVIDER) :
 				x.add_row([tok.html,'---'])
 			else :
-				x.add_row([tok.html,tok.type])
+				x.add_row([tok.html,tok.type.name])
 		print()
 		print(x)
 		print()
@@ -177,5 +176,6 @@ def printout():
 files = [];
 list_token = [];
 
-initiate('index.html')
-printout();
+initiate('aaa.html')
+
+printout()
