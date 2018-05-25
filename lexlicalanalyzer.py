@@ -194,7 +194,6 @@ def initiate(filename):
 					else:
 						tokens.append(Token(i,''.join(map(str,result_any)),TokenType.JS_SECTION))
 				list_token.append(tokens)
-			files.append(line)
 			i+=1	
 			
 		
