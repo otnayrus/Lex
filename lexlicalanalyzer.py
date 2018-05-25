@@ -17,6 +17,10 @@ class TokenType(Enum):
 	ELEMENT = 11
 	DOCUMENT_TYPE = 12
 	UNKNOWN_DATA = 13
+	CSS_SECTION = 14
+	JS_SECTION = 15
+	CSS_SECTION1 = 16
+	JS_SECTION1 = 17
 
 class Token:
 	def __init__(self,idx,string,tokentype):
@@ -24,7 +28,7 @@ class Token:
 		self.html = string
 		self.type = tokentype;
 
-def TokenBuilder(string,idx):	
+def Generate(string,idx):
 	re_document_type = re.compile("<!.* html>")
 	re_comment_open = re.compile("\<!--")
 	re_open_tag = re.compile("""(<)([a-z0-9]+)([a-zA-Z0-9 ='",.\-_:/]*?)(>)""")
@@ -141,23 +145,64 @@ def parse_attr(string):
 			break
 		idx+=1
 	return list_attr
-
+	
 def initiate(filename):
 	global files
+	re_css = re.compile("(.*)?(?=<style>)(<style>)([^\n]*)")
+	re_js = re.compile("(.*)?(?=<script>)(<script>)([^\n]*)")
+	re_close_css = re.compile("</style>")
+	re_close_js = re.compile("</script>")
+	re_any = re.compile(".+")
 	i = 0
+	css = 0
+	js = 0
 	with open(filename,'r+') as f :
 		for line in f :
-			TokenBuilder(line,i)
+			result_css = re_css.findall(line)
+			result_js = re_js.findall(line)
+			result_close_css = re_close_css.findall(line)
+			result_close_js = re_close_js.findall(line)
+			result_any = re_any.findall(line)
+			print(result_css,result_js)
+			if result_css and css == 0 and js == 0:
+				css += 1
+			elif result_js and css == 0 and js == 0:
+				js += 1
+			if result_close_css and css > 0:
+				css -= 1
+			elif result_close_js and js > 0:
+				js -= 1
+				
+			if css == 0 and js == 0 :
+				Generate(line,i)
+				
+			else:
+				global list_token
+				tokens = []
+				if css > 0 :
+					if result_css:
+						if result_css[0][0] != '\n' : tokens.append(Token(i,''.join(map(str,result_css[0][0])),TokenType.CSS_SECTION))
+						Generate(result_css[0][1],i)
+						if result_css[0][2] != '\n' : tokens.append(Token(i,''.join(map(str,result_css[0][2])),TokenType.CSS_SECTION1))
+					else:
+						tokens.append(Token(i,''.join(map(str,result_any)),TokenType.CSS_SECTION))
+				elif js > 0 :
+					if result_js:
+						if result_js[0][0] != '\n' : tokens.append(Token(i,''.join(map(str,result_js[0][0])),TokenType.JS_SECTION))
+						Generate(result_js[0][1],i)
+						if result_js[0][2] != '\n' : tokens.append(Token(i,''.join(map(str,result_js[0][2])),TokenType.JS_SECTION1))
+					else:
+						tokens.append(Token(i,''.join(map(str,result_any)),TokenType.JS_SECTION))
+				list_token.append(tokens)
 			files.append(line)
-			i+=1
+			i+=1	
+			
 		
 def printout():
 	global list_token
-	global files
 	row_i = 0
 	
 	for tokens in list_token:
-		print(files[row_i],end='')
 		x = [['Token','Type']]
 		for tok in tokens:
 			if(tok.type == TokenType.ELEMENT) :
@@ -166,11 +211,8 @@ def printout():
 				x.append([tok.html,tok.type.name])
 		print()
 		print(tabulate(x))
-		#print(x,'\n')
 		print()
-		row_i+=1
 #-----------------------------------------
-files = [];
 list_token = [];
 initiate('aaa.html')
 printout()
