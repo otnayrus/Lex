@@ -31,10 +31,10 @@ class Token:
 def Generate(string,idx):
 	re_document_type = re.compile("<!.* html>")
 	re_comment_open = re.compile("\<!--")
-	re_open_tag = re.compile("""(<)([a-z0-9]+)([a-zA-Z0-9 ='",.\-_:/]*?)(>)""")
-	re_self_closing_tag = re.compile("""(<)([a-z0-9]+)([a-zA-Z0-9 ='",.\-_:/]*?)(\/>)""")
+	re_open_tag = re.compile("""(<([a-z0-9]+)([a-zA-Z0-9 '",.-_#]*?)>)""")
+	re_self_closing_tag = re.compile("""(<([a-z0-9]+)([a-zA-Z0-9 ='",.\-_:/]*?)\/>)""")
 	re_raw_data = re.compile(">.+<")
-	re_close_tag = re.compile("""(</)([a-z0-9]+)(?!\/)(>)""")
+	re_close_tag = re.compile("""(</([a-z0-9]+)(?!\/)>)""")
 	re_comment_close = re.compile("(.)*(-->)")
 	re_raw_data2 = re.compile(".+")
 	
@@ -101,7 +101,7 @@ def tokenize(idx,results,tipe):
 			if(res == '/') and tipe != 'self_closing_tag':
 				continue
 			tokens.append(Token(idx,result[0],TokenType.TAG_OPEN_SYMBOL))
-			tagName = result[1]
+			tagName = result[0]
 			tokens.append(Token(idx,tagName,TokenType.TAG_NAME))
 			attribute = parse_attr(result[0])
 			for attr in attribute:
@@ -114,13 +114,10 @@ def tokenize(idx,results,tipe):
 					attr = attr.strip()
 					if attr != "" : 
 						tokens.append(Token(idx,attr,TokenType.TAG_IDENTIFIER))
-			tokens.append(Token(idx,result[3],TokenType.TAG_CLOSE_SYMBOL))
 		if tipe == 'close_tag' :
-			tokens.append(Token(idx,result[0],TokenType.TAG_OPEN_SYMBOL))
-			tokens.append(Token(idx,result[1],TokenType.TAG_NAME))
-			tokens.append(Token(idx,result[2],TokenType.TAG_CLOSE_SYMBOL))
+			tokens.append(Token(idx,result[0],TokenType.TAG_NAME))
 		if tipe == 'comment_close':
-			tokens.append(Token(idx,result[1],TokenType.COMMENT_OPEN))
+			tokens.append(Token(idx,result[0],TokenType.COMMENT_OPEN))
 		if tipe == 'document_type':
 			tokens.append(Token(idx,''.join(map(str,result)),TokenType.DOCUMENT_TYPE))
 		
@@ -163,7 +160,6 @@ def initiate(filename):
 			result_close_css = re_close_css.findall(line)
 			result_close_js = re_close_js.findall(line)
 			result_any = re_any.findall(line)
-			print(result_css,result_js)
 			if result_css and css == 0 and js == 0:
 				css += 1
 			elif result_js and css == 0 and js == 0:
@@ -173,7 +169,7 @@ def initiate(filename):
 			elif result_close_js and js > 0:
 				js -= 1
 				
-			if css == 0 and js == 0 :
+			if css == 0 and js == 0:
 				Generate(line,i)
 				
 			else:
@@ -181,16 +177,16 @@ def initiate(filename):
 				tokens = []
 				if css > 0 :
 					if result_css:
-						if result_css[0][0] != '\n' : tokens.append(Token(i,''.join(map(str,result_css[0][0])),TokenType.CSS_SECTION))
+						if result_css[0][0] != '\n' and result_css[0][0]!='' : Generate(result_css[0][0],i)
 						Generate(result_css[0][1],i)
-						if result_css[0][2] != '\n' : tokens.append(Token(i,''.join(map(str,result_css[0][2])),TokenType.CSS_SECTION1))
+						if result_css[0][2] != '\n' and result_css[0][2]!='' : tokens.append(Token(i,''.join(map(str,result_css[0][2])),TokenType.CSS_SECTION1))
 					else:
 						tokens.append(Token(i,''.join(map(str,result_any)),TokenType.CSS_SECTION))
 				elif js > 0 :
 					if result_js:
-						if result_js[0][0] != '\n' : tokens.append(Token(i,''.join(map(str,result_js[0][0])),TokenType.JS_SECTION))
+						if result_js[0][0] != '\n' and result_js[0][0]!='' : Generate(result_js[0][0],i)
 						Generate(result_js[0][1],i)
-						if result_js[0][2] != '\n' : tokens.append(Token(i,''.join(map(str,result_js[0][2])),TokenType.JS_SECTION1))
+						if result_js[0][2] != '\n' and result_js[0][2]!='' : tokens.append(Token(i,''.join(map(str,result_js[0][2])),TokenType.JS_SECTION1))
 					else:
 						tokens.append(Token(i,''.join(map(str,result_any)),TokenType.JS_SECTION))
 				list_token.append(tokens)
@@ -208,10 +204,9 @@ def printout():
 				x.append([tok.html,' '])
 			else :
 				x.append([tok.html,tok.type.name])
-		print()
 		print(tabulate(x))
 		print()
 #-----------------------------------------
 list_token = [];
-initiate('aaa.html')
+initiate('test.html')
 printout()
