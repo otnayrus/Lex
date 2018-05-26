@@ -71,7 +71,20 @@ def bedah(string):
 	
 	if t_doctype == [] and t_open_tag == [] and t_close_tag == [] and t_self_tag == [] and t_raw == [] :
 		t_any = re_any.findall(string)
-	#tokenize belum	
+	
+	if t_doctype :
+		t.append(Token(''.join(map(str,t_doctype[0])),"TAG_DOCTYPE"))
+	elif t_raw :
+		t.append(Token(''.join(map(str,t_raw[0]))[1:-1],"RAW"))
+	elif t_close_tag :
+		t.append(Token(t_close_tag[0][0], "CLOSE_TAG"))
+	elif t_open_tag :
+		#
+	elif t_self_tag :
+		#
+	else :
+		t_any = re_any.findall(string)
+		
 	#print(t_doctype, t_open_tag, t_close_tag, t_self_tag, t_raw)
 	
 def parse_attr(string):
