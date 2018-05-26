@@ -75,13 +75,18 @@ def bedah(string):
 	if t_doctype :
 		t.append(Token(''.join(map(str,t_doctype[0])),"TAG_DOCTYPE"))
 	if t_open_tag :
-		t.append(Token(t_open_tag[0][0], "OPEN_TAG"))
+		for tags in t_open_tag :
+			t.append(Token(tags[0], "OPEN_TAG"))
 	if t_raw :
 		t.append(Token(''.join(map(str,t_raw[0]))[1:-1],"RAW"))	
 	if t_close_tag :
-		t.append(Token(t_close_tag[0][0], "CLOSE_TAG"))
+		for tags in t_close_tag :
+			t.append(Token(tags[0], "OPEN_TAG"))
 	if t_self_tag :
-		t.append(Token(t_self_tag[0][0], "SELF_TAG"))
+		for tags in t_self_tag :
+			t.append(Token(tags[0], "OPEN_TAG"))
+	if t_any :
+		t.append(Token(t_any[0], "UNKNOWN_DATA"))
 	
 	box.append(t)
 	t = []
