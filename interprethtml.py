@@ -56,11 +56,13 @@ def saring(line):
 def bedah(string):
 	global box
 	global t
+	d = '"'
 	re_open_tag = re.compile("""(<([a-z0-9]+)([a-zA-Z0-9 '",.-_#]*?)>)""")
 	re_close_tag = re.compile("""(</([a-z0-9]+)(?!\/)>)""")
 	re_self_tag = re.compile("""(<([a-z0-9]+)([a-zA-Z0-9 ='",.\-_:/#]*?)\/>)""")
+	re_attr = re.compile("""(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?""")
 	re_doctype = re.compile("<!.* html>")
-	re_raw = re.compile(">.+<")
+	re_raw = re.compile(">[^><]+<")
 	re_any = re.compile(".+")
 	
 	t_doctype = re_doctype.findall(string)
@@ -77,42 +79,30 @@ def bedah(string):
 	if t_open_tag :
 		for tags in t_open_tag :
 			t.append(Token(tags[0], "OPEN_TAG"))
+			if tags[2] != '':
+				t_attr = re_attr.findall(tags[0])
+				for a in t_attr:
+					t.append(Token(''.join(map(str,a[0])), "ATTR_NAME"))
+					t.append(Token(''.join(map(str,a[1])), "ATTR_VALUE"))
 	if t_raw :
-		t.append(Token(''.join(map(str,t_raw[0]))[1:-1],"RAW"))	
+		for tags in t_raw:
+			t.append(Token(''.join(map(str,tags))[1:-1],"RAW"))	
 	if t_close_tag :
 		for tags in t_close_tag :
-			t.append(Token(tags[0], "OPEN_TAG"))
+			t.append(Token(tags[0], "CLOSE_TAG"))
 	if t_self_tag :
 		for tags in t_self_tag :
-			t.append(Token(tags[0], "OPEN_TAG"))
+			t.append(Token(tags[0], "SELF_TAG"))
+			if tags[2] != '':
+				t_attr = re_attr.findall(tags[0])
+				for a in t_attr:
+					t.append(Token(''.join(map(str,a[0])), "ATTR_NAME"))
+					t.append(Token(''.join(map(str,a[1])), "ATTR_VALUE"))
 	if t_any :
 		t.append(Token(t_any[0], "UNKNOWN_DATA"))
 	
 	box.append(t)
 	t = []
-	#print(t_doctype, t_open_tag, t_close_tag, t_self_tag, t_raw)
-	
-def parse_attr(string):
-	list_attr = []
-	count_quote = 0
-	idx = 0
-	while True :
-		try :
-			if string[idx] == ' ' and count_quote!=1:
-				list_attr.append(string[idx])
-				string = string[idx+1:]
-				idx = 0
-			if string[idx] == '"' or string[idx] == "'" : 
-				count_quote+=1
-			if count_quote == 2:
-				list_attr.append(string[:idx+1])
-				string = string[idx+1:]
-				idx = 0
-				count_quote = 0
-		except IndexError :
-			break
-		idx+=1
-	return list_attr
 	
 def printout():
 	global box

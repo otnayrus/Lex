@@ -1,0 +1,138 @@
+Masukkan nama file : ---------------  -----------
+Token            Type
+<!DOCTYPE html>  TAG_DOCTYPE
+---------------  -----------
+
+------  --------
+Token   Type
+<html>  OPEN_TAG
+------  --------
+
+------  --------
+Token   Type
+<head>  OPEN_TAG
+------  --------
+
+------------  ---------
+Token         Type
+<title>       OPEN_TAG
+My Test Case  RAW
+</title>      CLOSE_TAG
+------------  ---------
+
+-------  ---------
+Token    Type
+</head>  CLOSE_TAG
+-------  ---------
+
+------  --------
+Token   Type
+<body>  OPEN_TAG
+------  --------
+
+--------------------------------  ----------
+Token                             Type
+<form action="/#" method="post">  OPEN_TAG
+action                            ATTR_NAME
+/#                                ATTR_VALUE
+method                            ATTR_NAME
+post                              ATTR_VALUE
+--------------------------------  ----------
+
+--------------------------------  ----------
+Token                             Type
+<b>                               OPEN_TAG
+<input type="text" name="fname">  OPEN_TAG
+type                              ATTR_NAME
+text                              ATTR_VALUE
+name                              ATTR_NAME
+fname                             ATTR_VALUE
+First name:                       RAW
+--------------------------------  ----------
+
+--------------------------------  ----------
+Token                             Type
+<input type="text" name="lname">  OPEN_TAG
+type                              ATTR_NAME
+text                              ATTR_VALUE
+name                              ATTR_NAME
+lname                             ATTR_VALUE
+<br>                              OPEN_TAG
+--------------------------------  ----------
+
+------------------------------------  ----------
+Token                                 Type
+<input type="submit" value="Submit">  OPEN_TAG
+type                                  ATTR_NAME
+submit                                ATTR_VALUE
+value                                 ATTR_NAME
+Submit                                ATTR_VALUE
+------------------------------------  ----------
+
+-------  ---------
+Token    Type
+<br>     OPEN_TAG
+</form>  CLOSE_TAG
+-------  ---------
+
+---------  ---------
+Token      Type
+<button>   OPEN_TAG
+Click Me!  RAW
+</button>  CLOSE_TAG
+---------  ---------
+
+-----------------------------  ----------
+Token                          Type
+<textarea rows="4" cols="50">  OPEN_TAG
+rows                           ATTR_NAME
+"4                             ATTR_VALUE
+cols                           ATTR_NAME
+50                             ATTR_VALUE
+-----------------------------  ----------
+
+-------------------------------------------------------------------------------------------------------------------  ------------
+Token                                                                                                                Type
+At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies.  UNKNOWN_DATA
+-------------------------------------------------------------------------------------------------------------------  ------------
+
+-----------  ---------
+Token        Type
+</textarea>  CLOSE_TAG
+-----------  ---------
+
+--------------  ------------
+Token           Type
+d class="row">  UNKNOWN_DATA
+--------------  ------------
+
+---------  ---------
+Token      Type
+ikan teri  RAW
+</div>     CLOSE_TAG
+---------  ---------
+
+-----  ---------
+Token  Type
+</d>   CLOSE_TAG
+-----  ---------
+
+----------------------------------  ----------
+Token                               Type
+<a href="/#" style="color: blue;">  OPEN_TAG
+href                                ATTR_NAME
+/#                                  ATTR_VALUE
+style                               ATTR_NAME
+color: blue;                        ATTR_VALUE
+----------------------------------  ----------
+
+-------  ---------
+Token    Type
+</body>  CLOSE_TAG
+-------  ---------
+
+-------  ---------
+Token    Type
+</html>  CLOSE_TAG
+-------  ---------
+
