@@ -13,7 +13,6 @@ class Token:
 def saring(line):
 	global cm
 	global t
-	t = []
 	re_comment_open = re.compile("(.*)?(?=<!--)(<!--)([^\n]*)")
 	re_comment_inline = re.compile("(.*)?(?=<!--)(<!--)(.*)(-->)([^\n]*)")
 	re_comment_close = re.compile("(.*)?(?=-->)(-->)([^\n]*)")
@@ -26,7 +25,7 @@ def saring(line):
 			bedah(t_comment_inline[0][0])
 		t.append(Token(''.join(map(str,t_comment_inline[0][1])),"COMMENT_BEGIN_TAG"))
 		t.append(Token(''.join(map(str,t_comment_inline[0][2])),"COMMENT_SECTION"))
-		t.append(Token(''.join(map(str,t_comment_inline[0][3])),"COMMENT_BEGIN_TAG"))
+		t.append(Token(''.join(map(str,t_comment_inline[0][3])),"COMMENT_END_TAG"))
 		if(t_comment_inline[0][4] != '') : 
 			bedah(t_comment_inline[0][4])
 	elif t_comment_open :
@@ -47,14 +46,16 @@ def saring(line):
 	elif cm > 0 :
 		t.append(Token(line,"COMMENT_SECTION"))
 	
-	if cm == 0 :
+	if cm == 0 and t_comment_inline == []: 
 		bedah(line)
 		
-	box.append(t)
+	if t : box.append(t)
+	t = []
 	
 	
 def bedah(string):
 	global box
+	global t
 	re_open_tag = re.compile("""(<([a-z0-9]+)([a-zA-Z0-9 '",.-_#]*?)>)""")
 	re_close_tag = re.compile("""(</([a-z0-9]+)(?!\/)>)""")
 	re_self_tag = re.compile("""(<([a-z0-9]+)([a-zA-Z0-9 ='",.\-_:/#]*?)\/>)""")
@@ -68,23 +69,22 @@ def bedah(string):
 	t_self_tag = re_self_tag.findall(string)
 	t_raw = re_raw.findall(string)
 	t_any = []
-	
 	if t_doctype == [] and t_open_tag == [] and t_close_tag == [] and t_self_tag == [] and t_raw == [] :
 		t_any = re_any.findall(string)
 	
 	if t_doctype :
 		t.append(Token(''.join(map(str,t_doctype[0])),"TAG_DOCTYPE"))
-	elif t_raw :
-		t.append(Token(''.join(map(str,t_raw[0]))[1:-1],"RAW"))
-	elif t_close_tag :
+	if t_open_tag :
+		t.append(Token(t_open_tag[0][0], "OPEN_TAG"))
+	if t_raw :
+		t.append(Token(''.join(map(str,t_raw[0]))[1:-1],"RAW"))	
+	if t_close_tag :
 		t.append(Token(t_close_tag[0][0], "CLOSE_TAG"))
-	elif t_open_tag :
-		#
-	elif t_self_tag :
-		#
-	else :
-		t_any = re_any.findall(string)
-		
+	if t_self_tag :
+		t.append(Token(t_self_tag[0][0], "SELF_TAG"))
+	
+	box.append(t)
+	t = []
 	#print(t_doctype, t_open_tag, t_close_tag, t_self_tag, t_raw)
 	
 def parse_attr(string):
