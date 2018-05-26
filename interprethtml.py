@@ -6,9 +6,9 @@ box = []
 t = []
 
 class Token:
-	def __init__(self,string,tokentype):
-		self.html = string
-		self.type = tokentype;
+	def __init__(self,string,tipe):
+		self.htmlentities = string
+		self.type = tipe;
 
 def saring(line):
 	global cm
@@ -55,10 +55,10 @@ def saring(line):
 	
 def bedah(string):
 	global box
-	re_doctype = re.compile("<!.* html>")
 	re_open_tag = re.compile("""(<([a-z0-9]+)([a-zA-Z0-9 '",.-_#]*?)>)""")
 	re_close_tag = re.compile("""(</([a-z0-9]+)(?!\/)>)""")
 	re_self_tag = re.compile("""(<([a-z0-9]+)([a-zA-Z0-9 ='",.\-_:/#]*?)\/>)""")
+	re_doctype = re.compile("<!.* html>")
 	re_raw = re.compile(">.+<")
 	re_any = re.compile(".+")
 	
@@ -71,15 +71,37 @@ def bedah(string):
 	
 	if t_doctype == [] and t_open_tag == [] and t_close_tag == [] and t_self_tag == [] and t_raw == [] :
 		t_any = re_any.findall(string)
+	#tokenize belum	
 	#print(t_doctype, t_open_tag, t_close_tag, t_self_tag, t_raw)
 	
-
+def parse_attr(string):
+	list_attr = []
+	count_quote = 0
+	idx = 0
+	while True :
+		try :
+			if string[idx] == ' ' and count_quote!=1:
+				list_attr.append(string[idx])
+				string = string[idx+1:]
+				idx = 0
+			if string[idx] == '"' or string[idx] == "'" : 
+				count_quote+=1
+			if count_quote == 2:
+				list_attr.append(string[:idx+1])
+				string = string[idx+1:]
+				idx = 0
+				count_quote = 0
+		except IndexError :
+			break
+		idx+=1
+	return list_attr
+	
 def printout():
 	global box
 	for tokens in box:
 		r = [['Token','Type']]
 		for i in tokens:
-			r.append([i.html,i.type])
+			r.append([i.htmlentities,i.type])
 		print(tabulate(r))
 		print()
 		
